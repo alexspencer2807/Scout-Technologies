@@ -7,8 +7,11 @@
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Teko:wght@400;700&display=swap" rel="stylesheet">
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout.css') }}">
 </head>
@@ -18,7 +21,6 @@
   <div class="header-inner container">
     <img src="{{ url_for('static', filename='media/Scout Videography Logo.jpg') }}" class="header-logo" alt="Logo">
 
-    <!-- Navigation -->
     <ul class="nav-list">
       <li><a href="{{ url_for('home') }}">Home</a></li>
       <li><a href="{{ url_for('products') }}">Shop</a></li>
@@ -26,12 +28,10 @@
       <li><a href="{{ url_for('checkout') }}">Checkout</a></li>
     </ul>
 
-    <!-- Hamburger -->
     <div class="hamburger" id="hamburger">
       <span></span><span></span><span></span>
     </div>
 
-    <!-- Cart -->
     <div class="cart-icon" id="cartIcon">
       <i class="fas fa-shopping-cart"></i>
       <span id="cartCount">0</span>
@@ -55,10 +55,18 @@
 
     <!-- Stripe Payment Form -->
     <form id="payment-form">
-      <input type="text" name="name" placeholder="Full Name" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <div id="card-element" class="card-element"></div>
+
+      <h3>Contact Information</h3>
+      <input type="email" id="email" placeholder="Email" required>
+
+      <h3>Shipping Address</h3>
+      <div id="address-element" class="stripe-element"></div>
+
+      <h3>Payment Details</h3>
+      <div id="card-element" class="stripe-element"></div>
+
       <div id="payment-message" class="payment-message"></div>
+
       <button type="submit" class="btn">Pay Now</button>
     </form>
   </div>
@@ -87,17 +95,17 @@
   </div>
 </footer>
 
-<!-- Scripts -->
-<!-- Load Stripe JS library -->
+<!-- Stripe JS -->
 <script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripePublicKey = "{{ stripe_public_key }}";
+  const clientSecret = "{{ client_secret }}";
+</script>
+<script src="{{ url_for('static', filename='js/checkout.js') }}"></script>
 
-<!-- Initialize Stripe with your public key passed from Flask -->
-<script>const stripe = Stripe("{{ stripe_public_key }}");</script>
-
-<!-- Your other scripts -->
 <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
 <script src="{{ url_for('static', filename='js/hamburger.js') }}"></script>
 <script src="{{ url_for('static', filename='js/notification.js') }}"></script>
-<script src="{{ url_for('static', filename='js/checkout.js') }}"></script>
+
 </body>
 </html>

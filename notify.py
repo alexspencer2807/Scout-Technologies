@@ -51,12 +51,22 @@ def _extract_secret_from_header():
         return parts[1].strip()
     return raw
 
-@notify_bp.route("/notify", methods=["POST"])
-def notify_route():
-    secret = os.getenv("NOTIFY_SECRET")
-    header = request.headers.get("X-Notify-Secret")
-    if secret and header != secret:
-        return jsonify({"ok": False, "error": "unauthorized"}), 401
+
+@notify_bp.route("/notify-checkout", methods=["POST"])
+def notify_checkout():
     data = request.get_json() or {}
-    sent = send_email(data.get("subject","Notification"), data.get("message",""))
-    return jsonify({"ok": sent, "error": None if sent else "send_failed"}), 200 if sent else 500
+    name = data.get("name", "Customer")
+    cart_items = data.get("cart", [])
+    action = data.get("action", "Checkout")
+
+    # Build item list
+    items_list = "\n".join([f"- {item['name']} x{item['quantity']}" for item in cart_items]) or "No items"
+
+    # Email body
+    body = f"User {name} clicked '{action}' and has ordered the following items:\n{items_list}"
+
+    # Send to host
+    host_email = os.getenv("EMAIL_TO")
+    send_email(subject=f"Order Notification: {action}", body=body, to_addr=host_email)
+
+    return jsonify({"ok": True})

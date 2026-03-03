@@ -1,147 +1,113 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const paymentForm = document.getElementById("payment-form");
-  const paymentMessage = document.getElementById("payment-message");
+  // --- Load cart from localStorage ---
+  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  const stripe = Stripe("pk_test_51T6xjBLsMXS9E6aFTuZMBsCrwxlOctoyuGOeEYtHrMACpO9xx9w8s2yuCV5GdDB0juEsIGmtvHWG1M5cdw3jZQ5G00EBhhHfdw");
-  const elements = stripe.elements();
-  const cardElement = elements.create("card");
-  cardElement.mount("#card-element");
+  // --- Render checkout summary ---
+  const cartContainer = document.getElementById("cartItemsSummary");
 
-  paymentForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
 
-    // 1️⃣ Create PaymentIntent
-    const res = await fetch("/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cart })
-    });
-    const data = await res.json();
-    if (data.error) {
-      paymentMessage.textContent = data.error;
-      paymentMessage.style.color = "red";
+  function renderCart() {
+    if (!cart.length) {
+      cartContainer.innerHTML = "<p>Your cart is empty</p>";
       return;
     }
 
-    // 2️⃣ Confirm payment
-    const { error, paymentIntent } = await stripe.confirmCardPayment(data.client_secret, {
-      payment_method: {
-        card: cardElement,
-        billing_details: {
-          name: paymentForm.name.value,
-          email: paymentForm.email.value
-        }
-      }
-    });
-
-    if (error) {
-      paymentMessage.textContent = error.message;
-      paymentMessage.style.color = "red";
-      return;
-    }
-
-    if (paymentIntent && paymentIntent.status === "succeeded") {
-      paymentMessage.textContent = "Payment successful!";
-      paymentMessage.style.color = "green";
-
-      // 3️⃣ Send email notification
-      await fetch("/notify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Notify-Secret": "a-strong-secret"  // match your .env
-        },
-        body: JSON.stringify({
-          subject: "New Paid Order",
-          message: `New order by ${paymentForm.name.value} (${paymentForm.email.value})\n\nItems:\n${cart.map(i => `${i.name} x${i.quantity} - $${i.price}`).join("\n")}\n\nTotal: $${cart.reduce((a,b)=>a+b.price*b.quantity,0).toFixed(2)}`
-        })
-      });
-
-      // 4️⃣ Clear cart if you want
-      localStorage.removeItem("cart");
-    }
-  });
-});
-document.addEventListener("DOMContentLoaded", async () => {
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const cartItemsDiv = document.getElementById("cartItemsSummary");
-  let totalAmount = 0;
-
-  if (cartItemsDiv) {
-    cartItemsDiv.innerHTML = cart.map(item => {
-      totalAmount += item.price * item.quantity;
+    let total = 0;
+    const rows = cart.map(item => {
+      const line = item.price * item.quantity;
+      total += line;
       return `
-        <p>
-          <strong>${item.name}</strong> x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}
-        </p>
+        <li class="checkout-item">
+          <img src="${item.image}" class="cart-item-img" alt="${escapeHtml(item.name)}">
+          <div class="checkout-item-details">
+            <span class="checkout-item-name">${escapeHtml(item.name)}</span>
+            <span class="checkout-item-qty">Qty: ${item.quantity}</span>
+          </div>
+          <span class="checkout-item-line">$${line.toFixed(2)}</span>
+        </li>
       `;
     }).join("");
 
-    cartItemsDiv.innerHTML += `<p><strong>Total: $${totalAmount.toFixed(2)}</strong></p>`;
+    cartContainer.innerHTML = `
+      <ul class="checkout-items">${rows}</ul>
+      <p class="checkout-total">Total: $${total.toFixed(2)}</p>
+    `;
   }
 
-  // --- Stripe integration ---
-  const stripe = Stripe("pk_test_51T6xjBLsMXS9E6aFTuZMBsCrwxlOctoyuGOeEYtHrMACpO9xx9w8s2yuCV5GdDB0juEsIGmtvHWG1M5cdw3jZQ5G00EBhhHfdw");
+  renderCart();
+
+  // --- Notify function ---
+  async function notifyHost(actionName) {
+    try {
+      await fetch("/notify-checkout", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ name: "Cart User", email: "N/A", cart, action: actionName })
+      });
+    } catch (err) { console.error("Notification failed:", err); }
+  }
+
+  // --- Cart Checkout Button ---
+  const cartCheckoutBtn = document.getElementById("cartCheckoutBtn");
+  cartCheckoutBtn.addEventListener("click", async () => {
+    await notifyHost("Cart Checkout Button");
+    window.location.href = "/checkout";
+  });
+
+  // --- Stripe setup ---
+  if (typeof Stripe === "undefined") { console.error("Stripe.js not loaded"); return; }
+
+  const stripe = Stripe(stripePublicKey);
   const elements = stripe.elements();
+
+  const addressElement = elements.create("address", { mode: "shipping", allowedCountries: ["US"] });
+  addressElement.mount("#address-element");
+
   const cardElement = elements.create("card");
   cardElement.mount("#card-element");
 
-  const paymentForm = document.getElementById("payment-form");
-  const paymentMessage = document.getElementById("payment-message");
+  const form = document.getElementById("payment-form");
+  const message = document.getElementById("payment-message");
 
-  paymentForm.addEventListener("submit", async e => {
+  form.addEventListener("submit", async e => {
     e.preventDefault();
+    message.textContent = "Processing payment...";
 
-    if (cart.length === 0) {
-      paymentMessage.textContent = "Your cart is empty!";
-      return;
-    }
+    const email = document.getElementById("email").value;
+    const name = email || "Customer";
 
-    const res = await fetch("/create-payment-intent", {
+    // Notify host when Pay Now clicked
+    await fetch("/notify-checkout", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ name, cart, action: "Pay Now Button" })
+    });
+
+    // Create PaymentIntent
+    const res = await fetch("/create-payment-intent", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ cart })
     });
-
     const data = await res.json();
-    if (data.error) {
-      paymentMessage.textContent = data.error;
-      return;
-    }
+    if (data.error) { message.textContent = data.error; return; }
 
-    const { error } = await stripe.confirmCardPayment(data.client_secret, {
-      payment_method: {
-        card: cardElement,
-        billing_details: {
-          name: paymentForm.name.value,
-          email: paymentForm.email.value
-        }
-      }
+    const { error, paymentIntent } = await stripe.confirmCardPayment(data.client_secret, {
+      payment_method: { card: cardElement, billing_details: { name, email } },
+      shipping: addressElement.value
     });
 
-    if (error) {
-      paymentMessage.textContent = error.message;
-    } else {
-      paymentMessage.textContent = "Payment successful!";
+    if (error) { message.textContent = error.message; return; }
 
-      // Send notification email
-      fetch("/notify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Notify-Secret": "a-strong-secret"
-        },
-        body: JSON.stringify({
-          subject: "New Checkout",
-          message: `Order by ${paymentForm.name.value} (${paymentForm.email.value})\n\nItems:\n${cart.map(i => `${i.name} x ${i.quantity}`).join("\n")}`
-        })
-      });
-
-      // Clear cart after payment
+    if (paymentIntent.status === "succeeded") {
+      message.textContent = "Payment successful!";
       localStorage.removeItem("cart");
-      cartItemsDiv.innerHTML = "<p>Your cart is now empty.</p>";
-      document.getElementById("cartCount").textContent = "0";
+      setTimeout(() => window.location.href = "/checkout", 1500);
     }
   });
 });

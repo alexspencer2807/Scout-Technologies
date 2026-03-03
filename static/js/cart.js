@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const li = document.createElement("li");
       li.innerHTML = `
         <div class="cart-item">
-          <img src="${item.image}" class="cart-item-img">
+          <img src="${item.image}" class="cart-item-img" style="width:40px;height:40px;border-radius:4px;margin-right:8px;">
           <div class="cart-item-details">
             <strong>${item.name}</strong>
             <span>Qty: ${item.quantity}</span>
@@ -40,32 +40,69 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.querySelectorAll(".product-btn").forEach(btn => {
-    btn.addEventListener("click", ()=>{
-      const name=btn.dataset.name, price=parseFloat(btn.dataset.price), image=btn.dataset.image;
-      if(!name || isNaN(price) || !image) return;
-      const existing = cart.find(i=>i.name===name);
-      existing ? existing.quantity++ : cart.push({name,price,image,quantity:1});
-      saveCart(); renderCart();
-    });
+document.querySelectorAll(".product-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const name = btn.dataset.name;
+    const price = parseFloat(btn.dataset.price);
+    const image = btn.dataset.image;
+    if (!name || isNaN(price) || !image) return;
+
+    const existing = cart.find(i => i.name === name);
+    if (existing) {
+      existing.quantity++;
+      existing.image = image; // <-- update image to ensure correct one shows
+    } else {
+      cart.push({ name, price, image, quantity: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
   });
+});
 
   cartIcon.addEventListener("click", e => {
     e.stopPropagation(); cartDropdown.classList.toggle("show");
   });
-  document.addEventListener("click", e=>{
-    if(!cartDropdown.contains(e.target)&&!cartIcon.contains(e.target)) cartDropdown.classList.remove("show");
+
+  document.addEventListener("click", e => {
+    if(!cartDropdown.contains(e.target) && !cartIcon.contains(e.target)) 
+      cartDropdown.classList.remove("show");
   });
 
-  // --- Dropdown checkout button email ---
-  cartCheckoutBtn.addEventListener("click", async ()=>{
+  // Notify host when checkout button clicked
+  cartCheckoutBtn.addEventListener("click", async () => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     await fetch("/notify-checkout", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({name:"Cart User",email:"N/A",cart})
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "Cart User", cart, action: "Cart Checkout Button" })
     });
-    window.location.href="/checkout";
+    window.location.href = "/checkout";
   });
 
   renderCart();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const cartCheckoutBtn = document.getElementById("cartCheckoutBtn");
+  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  cartCheckoutBtn.addEventListener("click", async () => {
+    try {
+      await fetch("/notify-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Cart User",           // optional: you can prompt for name
+          email: "N/A",                // optional: if no email yet
+          cart: cart
+        })
+      });
+      // Redirect to checkout page
+      window.location.href = "/checkout";
+    } catch (err) {
+      console.error("Failed to notify checkout:", err);
+      window.location.href = "/checkout";
+    }
+  });
 });
