@@ -15,35 +15,30 @@
       <img src="{{ url_for('static', filename='media/Scout Videography Logo.jpg') }}" class="header-logo" alt="Logo">
 
       <!-- Navigation -->
-      <ul class="nav-list" id="navList">
+      <ul class="nav-list">
         <li><a href="{{ url_for('home') }}">Home</a></li>
         <li><a href="{{ url_for('products') }}">Shop</a></li>
         <li><a href="{{ url_for('about') }}">About</a></li>
         <li><a href="{{ url_for('checkout') }}">Checkout</a></li>
       </ul>
 
-      <!-- Hamburger Button -->
+      <!-- Hamburger -->
       <div class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </div>
 
-      <!-- Cart Icon -->
+      <!-- Cart -->
       <div class="cart-icon" id="cartIcon">
         <i class="fas fa-shopping-cart"></i>
         <span id="cartCount">0</span>
       </div>
-    </div>
 
-    <!-- Cart Dropdown -->
-    <div class="cart-dropdown" id="cartDropdown">
-      <h3>Your Cart</h3>
-      <ul id="cartItems"></ul>
-      <p>Total: $<span id="cartTotal">0</span></p>
-      <a href="{{ url_for('checkout') }}">
-        <button id="checkoutBtn">Checkout</button>
-      </a>
+      <div class="cart-dropdown" id="cartDropdown">
+        <h3>Your Cart</h3>
+        <ul id="cartItems"></ul>
+        <p>Total: $<span id="cartTotal">0</span></p>
+        <button type="button" class="btn" id="cartCheckoutBtn">Checkout</button>
+      </div>
     </div>
   </header>
 

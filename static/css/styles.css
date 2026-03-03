@@ -215,32 +215,31 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 18px;
   cursor: pointer;
 }
-#checkoutBtn {
-  display: block;
+/* Cart Dropdown Checkout Button */
+#cartDropdown .btn {
+  display: inline-block;
   width: 100%;
-  padding: 12px 0;
-  background: var(--accent);
-  color: #000;
+  text-align: center;
+  background-color: var(--accent);
+  color: var(--bg-dark);
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1rem;
   border: none;
   border-radius: var(--radius);
+  padding: 10px 0;
   cursor: pointer;
-  text-align: center;
-  transition: background 0.25s ease, transform 0.2s;
-  text-decoration: none;    /* remove underline */
+  transition: all 0.2s ease-in-out;
+  margin-top: 10px;
 }
 
-#checkoutBtn:hover {
-  background: var(--accent-dark);
-  color: #fff;
+#cartDropdown .btn:hover {
+  background-color: var(--accent-dark);
   transform: translateY(-2px);
 }
 
-#checkoutBtn:active {
+#cartDropdown .btn:active {
   transform: translateY(0);
 }
-
 /* Remove underline from parent link */
 .cart-dropdown a {
   text-decoration: none;
@@ -273,7 +272,7 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
 }
 
-.btn {
+.btn{
   display: inline-block;
   padding: 12px 30px;
   background: var(--accent);
@@ -339,7 +338,84 @@ h1, h2, h3, h4, h5, h6 {
   min-width: max-content;
   scroll-snap-align: start;
 }
+/* ================= Stripe Payment Section ================= */
+/* Container */
+.section .container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
 
+/* Form Elements */
+#payment-form input[type="text"],
+#payment-form input[type="email"],
+#card-element {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#payment-form input:focus,
+#card-element.StripeElement--focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(194, 184, 163, 0.3);
+  outline: none;
+}
+
+/* Stripe Card Element Styling */
+.StripeElement {
+  padding: 12px 15px;
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+}
+
+/* Payment Message */
+.payment-message {
+  font-weight: 600;
+  color: #d9534f;
+  margin-bottom: 12px;
+}
+
+/* Pay Button */
+#payment-form .btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  background-color: var(--accent);
+  color: var(--text-light);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#payment-form .btn:hover {
+  background-color: var(--accent-dark);
+}
+
+/* Header spacing fix */
+.site-header {
+  margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .section .container {
+    padding: 20px;
+    margin: 20px;
+  }
+}
 /* ================= PRODUCT CARD ================= */
 .product-card {
   flex: 0 0 220px;
@@ -386,13 +462,13 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 8px;
 }
 
-.product-btn {
+.product-btn{
   padding: 8px 16px;
   font-size: 12px;
   border-radius: 20px;
   background: var(--accent);
   text-align: center;
-  font-weight: 600;
+  font-weight: 750;
   cursor: pointer;
   transition: var(--transition);
   margin-top: 5px;
@@ -406,6 +482,49 @@ h1, h2, h3, h4, h5, h6 {
   color: #fff;
 }
 
+/* toast notifications */
+.site-notification-container {
+  position: fixed;
+  right: 16px;
+  top: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.site-toast {
+  min-width: 220px;
+  max-width: 360px;
+  background: #111;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transform: translateY(-6px);
+  opacity: 0;
+  transition: all 0.28s ease;
+  pointer-events: auto;
+}
+
+.site-toast.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.site-toast-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}
+
+.site-toast-body {
+  font-size: 0.88rem;
+  line-height: 1.15;
+  opacity: 0.95;
+}
 /* ================= CHECKOUT FORM ================= */
 .checkout-form {
   max-width: 500px;
