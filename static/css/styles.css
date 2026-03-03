@@ -445,11 +445,6 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--accent-dark);
 }
 
-/* Header spacing fix */
-.site-header {
-  margin-bottom: 20px;
-}
-
 /* Responsive */
 @media (max-width: 600px) {
   .section .container {
