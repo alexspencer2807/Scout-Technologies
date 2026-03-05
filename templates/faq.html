@@ -26,7 +26,7 @@
       <li><a href="{{ url_for('products') }}">Shop</a></li>
       <li><a href="{{ url_for('about') }}">About</a></li>
       <li><a href="{{ url_for('checkout') }}">Checkout</a></li>
-      <li><a href="{{ url_for('contact') }}">Contact</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
     </ul>
 
     <div class="hamburger" id="hamburger">
@@ -46,35 +46,27 @@
     </div>
   </div>
 </header>
-
-<section class="section checkout-section">
+<section class="section">
   <div class="container">
-    <h1>Checkout</h1>
+    <h2>Frequently Asked Questions</h2>
 
-    <!-- Cart Summary -->
-    <div id="cartItemsSummary" class="cart-summary"></div>
-
-    <!-- Stripe Payment Form -->
-    <form id="payment-form">
-
-      <h3>Contact Information</h3>
-      <input type="email" id="email" placeholder="Email" required>
-
-    <div id="shipping-summary">
-    <h3>Shipping Address</h3>
-    <div id="address-element"></div>
+    <div class="info">
+      <h3>How long does shipping take?</h3>
+      <p>Orders usually ship within 1-2 business days.</p>
     </div>
 
-     <h3>Payment Details</h3>
-      <div id="card-element" class="stripe-element"></div>
+    <div class="info">
+      <h3>Do you accept returns?</h3>
+      <p>Yes. Returns are accepted within 30 days if the item is unused.</p>
+    </div>
 
-      <div id="payment-message" class="payment-message"></div>
+    <div class="info">
+      <h3>How do I track my order?</h3>
+      <p>You will receive an email with tracking information once your order ships.</p>
+    </div>
 
-      <button type="submit" class="btn">Pay Now</button>
-    </form>
   </div>
 </section>
-
 <footer class="site-footer">
   <div class="footer-container">
     <div class="footer-section">
@@ -102,18 +94,15 @@
 
 <!-- Stripe JS -->
 <script src="https://js.stripe.com/v3/"></script>
-
 <script>
   const stripePublicKey = "{{ stripe_public_key }}";
   const clientSecret = "{{ client_secret }}";
 </script>
-
 <script src="{{ url_for('static', filename='js/checkout.js') }}"></script>
-<script src="{{ url_for('static', filename='js/contact.js') }}"></script>
+
 <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
 <script src="{{ url_for('static', filename='js/hamburger.js') }}"></script>
 <script src="{{ url_for('static', filename='js/notification.js') }}"></script>
-
 
 </body>
 </html>

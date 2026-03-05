@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Scout Technologies | Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Teko:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner container">
+      <img src="{{ url_for('static', filename='media/Scout Videography Logo.jpg') }}" class="header-logo" alt="Logo">
+
+      <!-- Navigation -->
+      <ul class="nav-list">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('products') }}">Shop</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('checkout') }}">Checkout</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li> 
+      </ul>
+
+      <!-- Hamburger -->
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
+
+      <!-- Cart -->
+      <div class="cart-icon" id="cartIcon">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="cartCount">0</span>
+      </div>
+
+      <div class="cart-dropdown" id="cartDropdown">
+        <h3>Your Cart</h3>
+        <ul id="cartItems"></ul>
+        <p>Total: $<span id="cartTotal">0</span></p>
+        <button type="button" class="btn" id="cartCheckoutBtn">Checkout</button>
+      </div>
+    </div>
+  </header>
+
+<section class="section">
+  <div class="container">
+
+    <h2>Contact Us</h2>
+
+    <form class="contact-form" id="contactForm">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-section">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="{{ url_for('products') }}">Socks</a></li>
+        <li><a href="{{ url_for('products') }}">Shin Guards</a></li>
+        <li><a href="{{ url_for('products') }}">Grip Socks</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Company</h4>
+        <ul>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/shipping">Shipping & Returns</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+        </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Scout Technologies reserved.</p>
+  </div>
+</footer>
+
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripePublicKey = "{{ stripe_public_key }}";
+  const clientSecret = "{{ client_secret }}";
+</script>
+<script src="{{ url_for('static', filename='js/checkout.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/hamburger.js') }}"></script>
+<script src="{{ url_for('static', filename='js/notification.js') }}"></script>
+<script src="{{ url_for('static', filename='js/contact.js') }}"></script>
+
+</body>
+</html>

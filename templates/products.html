@@ -28,6 +28,7 @@
         <li><a href="{{ url_for('products') }}">Shop</a></li>
         <li><a href="{{ url_for('about') }}">About</a></li>
         <li><a href="{{ url_for('checkout') }}">Checkout</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
         </ul>
 
         <!-- Hamburger -->
@@ -239,7 +240,7 @@
           Add to Cart
         </button>
       </div>
-      
+
       <div class="product-card">
         <img src="{{ url_for('static', filename='media/grip socks pink.jpg') }}" class="product-image">
         <h3>Pink Grip Sock</h3>
@@ -305,16 +306,18 @@
       <div class="footer-section">
         <h4>Shop</h4>
         <ul>
-          <li><a href="{{ url_for('products') }}">Men</a></li>
-          <li><a href="{{ url_for('products') }}">Women</a></li>
-          <li><a href="{{ url_for('products') }}">Kids</a></li>
+          <li><a href="{{ url_for('products') }}">Socks</a></li>
+          <li><a href="{{ url_for('products') }}">Shin Guards</a></li>
+          <li><a href="{{ url_for('products') }}">Grip Socks</a></li>
         </ul>
       </div>
       <div class="footer-section">
         <h4>Company</h4>
         <ul>
-          <li><a href="{{ url_for('about') }}">About Us</a></li>
-          <li><a href="#">Careers</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/shipping">Shipping & Returns</a></li>
+            <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
     </div>
@@ -325,6 +328,8 @@
 <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
 <script src="{{ url_for('static', filename='js/hamburger.js') }}"></script>
 <script src="{{ url_for('static', filename='js/notification.js') }}"></script>
+<script src="{{ url_for('static', filename='js/contact.js') }}"></script>
+<script src="{{ url_for('static', filename='js/checkout.js') }}"></script>
 
 </body>
 </html>

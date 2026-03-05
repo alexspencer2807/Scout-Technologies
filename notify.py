@@ -70,3 +70,31 @@ def notify_checkout():
     send_email(subject=f"Order Notification: {action}", body=body, to_addr=host_email)
 
     return jsonify({"ok": True})
+
+@notify_bp.route("/notify-contact", methods=["POST"])
+def notify_contact():
+    data = request.get_json() or {}
+
+    name = data.get("name", "Unknown")
+    email = data.get("email", "Unknown")
+    message = data.get("message", "")
+
+    body = f"""
+New Contact Form Submission
+
+Name: {name}
+Email: {email}
+
+Message:
+{message}
+"""
+
+    host_email = os.getenv("EMAIL_TO")
+
+    send_email(
+        subject="New Contact Form Message",
+        body=body,
+        to_addr=host_email
+    )
+
+    return jsonify({"ok": True})

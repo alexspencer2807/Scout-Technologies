@@ -69,6 +69,8 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
   padding: 16px 0;
   flex-wrap: wrap;
+  width : 90%;
+  max-width: 1200px;
 }
 
 .header-logo {
@@ -89,7 +91,7 @@ h1, h2, h3, h4, h5, h6 {
 .nav-list a {
   text-decoration: none;
   color: var(--text-light);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.5px;
   transition: var(--transition);
   position: relative;
@@ -246,53 +248,13 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
   display: block;           /* ensure link fills button */
 }
-/* ================= Cart Summary ================= */
-.cart-summary {
-  background: var(--bg-card);
-  padding: 20px;
-  border-radius: var(--radius);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-}
 
-.cart-summary p {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 8px 0;
-  font-size: 16px;
-  color: var(--text-light);
-}
-
-.cart-summary p strong {
-  font-weight: 600;
-}
-
-.cart-summary p:last-child {
-  border-top: 1px solid rgba(255,255,255,0.2);
-  padding-top: 10px;
-  font-size: 18px;
-  color: var(--accent);
-}
-
-.cart-summary::-webkit-scrollbar {
-  width: 6px;
-}
-
-.cart-summary::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 3px;
-}
-
-.cart-summary::-webkit-scrollbar-track {
-  background: var(--bg-card);
-}
 /* ================= HERO ================= */
 .hero {
   text-align: center;
   padding: 140px 20px;
   min-height: 600px;
-  background: url('/static/media/hero background.jpg') center center / cover no-repeat;
+  background: url('/static/media/hero background.png') center center / cover no-repeat;
   background-attachment: fixed;
   display: flex;
   flex-direction: column;
@@ -307,7 +269,7 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: url('/static/media/hero background.jpg') center center / cover no-repeat;
+  background: url('/static/media/hero background 1.jpg') center center / cover no-repeat;
   background-attachment: fixed; /* optional parallax */
   ;}
 
@@ -531,15 +493,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* toast notifications */
+/* Notification container below the header */
 .site-notification-container {
   position: fixed;
-  right: 16px;
-  top: 16px;
+  top: 80px; /* default offset; JS will adjust dynamically */
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   pointer-events: none;
+  width: auto;
+  max-width: 400px;
+  align-items: center;
 }
 
 .site-toast {

@@ -42,48 +42,59 @@
       </div>
     </div>
   </header>
-
-  <!-- HERO -->
-  <section class="hero">
-    <h2>We are the number one location for professional sports gear.</h2>
-    <p>High-quality equipment and services for all your sports needs.</p>
-    <a class="btn" href="{{ url_for('products') }}">Shop Products</a>
-  </section>
-
-  <!-- ABOUT SNIPPET -->
-  <section class="section">
+    <section class="section">
     <div class="container">
-      <h1>About Scout Technologies</h1>
-      <p>Scout Technologies specializes in professional sports equipment, delivering high-quality socks, shin guards, and grip gear for athletes worldwide. Our mission is to provide premium sports gear that enhances performance, comfort, and style.</p>
-      <a class="btn" href="{{ url_for('about') }}">Learn More</a>
-    </div>
-  </section>
+        <h2>Shipping & Returns</h2>
 
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-section">
-        <h4>Shop</h4>
-        <ul>
-          <li><a href="{{ url_for('products') }}">Socks</a></li>
-          <li><a href="{{ url_for('products') }}">Shin Guards</a></li>
-          <li><a href="{{ url_for('products') }}">Grip Socks</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h4>Company</h4>
-        <ul>
-          <li><a href="/about">About Us</a></li>
-          <li><a href="/faq">FAQ</a></li>
-          <li><a href="/shipping">Shipping & Returns</a></li>
-          <li><a href="/contact">Contact Us</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 Scout Technologies reserved.</p>
-    </div>
-  </footer>
+        <div class="info">
+        <h3>Shipping</h3>
+        <p>
+            Orders are processed within 1-2 business days. Delivery time depends on
+            your location within the United States.
+        </p>
+        </div>
 
+        <div class="info">
+        <h3>Returns</h3>
+        <p>
+            If you are not satisfied with your order, you may return it within
+            30 days for a refund or exchange.
+        </p>
+        </div>
+
+        <div class="info">
+        <h3>Damaged Items</h3>
+        <p>
+            If your item arrives damaged, contact us and we will replace it.
+        </p>
+        </div>
+
+    </div>
+    </section>
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h4>Shop</h4>
+          <ul>
+            <li><a href="{{ url_for('products') }}">Socks</a></li>
+            <li><a href="{{ url_for('products') }}">Shin Guards</a></li>
+            <li><a href="{{ url_for('products') }}">Grip Socks</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Company</h4>
+          <ul>
+              <li><a href="/about">About Us</a></li>
+              <li><a href="/faq">FAQ</a></li>
+              <li><a href="/shipping">Shipping & Returns</a></li>
+              <li><a href="/contact">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Scout Technologies reserved.</p>
+      </div> 
+    </footer>
   <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
   <script src="{{ url_for('static', filename='js/hamburger.js') }}"></script>
 
