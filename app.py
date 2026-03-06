@@ -82,14 +82,39 @@ Address:
 def create_payment_intent():
     data = request.json
     cart = data.get("cart", [])
-    shipping = data.get("shipping")  # shippingData from frontend
+    shipping = data.get("shipping")
 
-    # Total in cents
-    amount = int(sum(item["price"] * item["quantity"] for item in cart) * 100 + 599)
+    subtotal = 0
+    total_items = 0
+
+    for item in cart:
+        price = float(item["price"])
+        qty = int(item["quantity"])
+        subtotal += price * qty
+        total_items += qty
+
+    # --- Bundle Discounts ---
+    discount_label = "none"
+    total = subtotal
+
+    if total_items >= 5:
+        total = subtotal * 0.8  # 20% off
+        discount_label = "5_item_bundle"
+    elif total_items >= 3:
+        total = subtotal * (5000/6000)  # 16.67% off
+        discount_label = "3_item_bundle"
+
+    total = max(total, 0)  # Ensure total is non-negative
+   
+ # Convert to cents for Stripe
+    amount = int(total * 100)
+
+    # Create short item summary for Stripe metadata
+    items_summary = ", ".join([f"{i['name']} x{i['quantity']}" for i in cart])
 
     payment_intent = stripe.PaymentIntent.create(
         amount=amount,
-        currency="usd",
+        currency="jmd",
         payment_method_types=["card"],
         shipping={
             "name": shipping.get("name"),
@@ -103,9 +128,14 @@ def create_payment_intent():
                 "country": shipping["address"].get("country")
             }
         },
-        metadata={"cart": json.dumps(cart)}
+        metadata={
+            "items": items_summary,
+            "items_count": total_items,
+            "discount": discount_label,
+            "final_price": total
+        }
     )
-
+    
     return jsonify({"client_secret": payment_intent.client_secret})
 
 # --- Stripe Webhook for Payment Confirmation ---
@@ -127,17 +157,20 @@ def stripe_webhook():
         customer_email = charge["billing_details"]["email"]
         customer_name = charge["billing_details"]["name"]
         amount = intent["amount_received"] / 100
-        items = intent.metadata
+        items = intent.metadata.get("items", "Unknown items")
 
         # Email to host
         host_body = f"""
-New Payment Received!
-Customer: {customer_name} ({customer_email})
-Amount: ${amount:.2f}
-Items:
-{json.dumps(items, indent=2)}
-Payment ID: {intent['id']}
-"""
+        New Payment Received!
+
+        Customer: {customer_name} ({customer_email})
+        Amount: ${amount:.2f}
+
+        Items:
+        {items}
+
+        Payment ID: {intent['id']}
+        """
         send_email(subject="New Payment Received", body=host_body, to_addr=HOST_EMAIL)
 
         # Email to customer

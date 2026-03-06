@@ -2,33 +2,82 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cartContainer = document.getElementById("cartItemsSummary");
   let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // --- Cart summary ---
-  if (cart.length) {
-    let subtotal = 0;
-    const rows = cart.map(i => {
-      const line = i.price * i.quantity;
-      subtotal += line;
-      return `
-        <li style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <img src="${i.image}" alt="${i.name}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;">
-            <span>${i.name} x${i.quantity}</span>
-          </div>
-          <span>$${line.toFixed(2)}</span>
-        </li>`;
-    }).join('');
+ // --- Cart summary ---
+if (cart.length) {
 
-    const shipping = 2.99;
-    const total = subtotal + shipping;
+  let subtotal = 0;
+  let totalItems = 0;
 
-    cartContainer.innerHTML = `
-      <ul style="list-style:none;padding:0;margin:0;">${rows}</ul>
-      <p style="text-align:right;margin-top:8px;"><strong>Subtotal: $${subtotal.toFixed(2)}</strong></p>
-      <p style="text-align:right;margin:4px 0;"><strong>Shipping: $${shipping.toFixed(2)}</strong></p>
-      <p style="text-align:right;font-weight:bold;font-size:1.1em;margin-top:6px;">Total: $${total.toFixed(2)}</p>`;
-  } else {
-    cartContainer.innerHTML = "<p style='text-align:center;color:#888;'>Your cart is empty</p>";
-  }
+  const rows = cart.map(i => {
+    const line = i.price * i.quantity;
+    subtotal += line;
+    totalItems += i.quantity;
+
+    return `
+      <li style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img src="${i.image}" alt="${i.name}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;">
+          <span>${i.name} x${i.quantity}</span>
+        </div>
+        <span>$${line.toFixed(2)}</span>
+      </li>`;
+  }).join('');
+
+  const shipping = 0.00;
+
+    // --- Discount Rules ---
+    let originalTotal = subtotal;
+    let discountedTotal = subtotal;
+    let discountLabel = "";
+
+    // --- Discount Rules by percentage ---
+    if (totalItems >= 5) {
+    discountedTotal = subtotal * 0.8; // 20% off
+    discountLabel = "5+ Item Bundle Discount (20% Off)";
+    } else if (totalItems >= 3) {
+    discountedTotal = subtotal * (5000/6000); // ~16.67% off
+    discountLabel = "3 Item Bundle Discount (~16.7% Off)";
+    }
+
+// Ensure total is not negative
+discountedTotal = Math.max(discountedTotal, 0);
+  const total = discountedTotal + shipping;
+
+  cartContainer.innerHTML = `
+    <ul style="list-style:none;padding:0;margin:0;">${rows}</ul>
+
+    <p style="text-align:right;margin-top:8px;">
+      <strong>Subtotal: $${subtotal.toFixed(2)}</strong>
+    </p>
+
+    ${
+      discountLabel
+      ? `<p style="text-align:right;color:#4caf50;font-weight:600;">
+          ${discountLabel}
+        </p>
+        <p style="text-align:right;font-size:1.05em;">
+          <span style="text-decoration:line-through;color:#999;margin-right:6px;">
+            $${originalTotal.toFixed(2)}
+          </span>
+          <span style="font-weight:bold;color:#4caf50;">
+            $${discountedTotal.toFixed(2)}
+          </span>
+        </p>`
+      : ""
+    }
+
+    <p style="text-align:right;margin:4px 0;">
+      <strong>Shipping: $${shipping.toFixed(2)}</strong>
+    </p>
+
+    <p style="text-align:right;font-weight:bold;font-size:1.2em;margin-top:6px;">
+      Total: $${total.toFixed(2)}
+    </p>
+  `;
+}
+else {
+  cartContainer.innerHTML = "<p style='text-align:center;color:#888;'>Your cart is empty</p>";
+}
 
   // --- Notify dropdown checkout ---
   async function notifyCartClick(buttonName) {
@@ -60,7 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const stripe = Stripe(stripePublicKey);
   const elements = stripe.elements();
 
-  const addressElement = elements.create("address", { mode: "shipping", allowedCountries: ["US"] });
+  const addressElement = elements.create("address", { mode: "shipping", allowedCountries: ["JM"] });
   addressElement.mount("#address-element");
 
   const cardElement = elements.create("card");
