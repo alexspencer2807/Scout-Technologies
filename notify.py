@@ -46,7 +46,7 @@ def send_email(subject, body, to_addr, attachment_path=None):
 
 
 # ---------------- PDF RECEIPT ----------------
-def generate_pdf_receipt(customer, email, cart_items, shipping, discount=0, filename="receipt.pdf"):
+def generate_pdf_receipt(customer, email, cart_items, shipping, discount=0, discount_label="", filename="receipt.pdf"):
 
     width, height = letter
     c = canvas.Canvas(filename, pagesize=letter)
@@ -166,7 +166,7 @@ def generate_pdf_receipt(customer, email, cart_items, shipping, discount=0, file
     c.drawRightString(550, y, f"${subtotal:.2f}")
     y -= 18
 
-    c.drawRightString(470, y, "Discount:")
+    c.drawRightString(470, y, f"Discount ({discount_label}):")
     c.drawRightString(550, y, f"-${discount:.2f}")
     y -= 18
 
@@ -201,11 +201,20 @@ def notify_checkout():
     total_items = sum(int(i.get("quantity", 1)) for i in cart_items)
 
     discount = 0
+    discount_label = ""
 
-    if total_items >= 5:
+    if total_items >= 10:
         discount = subtotal * 0.20
+        discount_label = "10+ Items Discount (20% Off)"
+    elif total_items >= 7:
+        discount = subtotal * 0.15
+        discount_label = "7-9 Items Discount (15% Off)"
+    elif total_items >= 5:
+        discount = subtotal * 0.10
+        discount_label = "5-6 Items Discount (10% Off)"
     elif total_items >= 3:
-        discount = subtotal * (1 - (5000/6000))
+        discount = subtotal * 0.05
+        discount_label = "3-4 Items Discount (5% Off)"
 
     name = (shipping.get("name") or "Customer").title()
     email = shipping.get("email") or data.get("email")
@@ -216,6 +225,7 @@ def notify_checkout():
         cart_items,
         shipping,
         discount,
+        discount_label=discount_label,   # <-- pass it here
         filename=f"receipt_{name.replace(' ','_')}.pdf",
     )
 
@@ -278,12 +288,9 @@ Scout Technologies
 # ---------------- STRIPE WEBHOOK ----------------
 @notify_bp.route("/webhook", methods=["POST"])
 def stripe_webhook():
-
     import stripe
-    discount = float(intent["metadata"].get("discount_amount", 0))
 
     webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
-
     payload = request.data
     sig_header = request.headers.get("Stripe-Signature")
 
@@ -293,19 +300,38 @@ def stripe_webhook():
         return jsonify({"error": str(e)}), 400
 
     if event["type"] == "payment_intent.succeeded":
-
         intent = event["data"]["object"]
 
         shipping = intent.get("shipping") or {}
-
         charge = intent["charges"]["data"][0]
-
         customer_name = charge["billing_details"].get("name") or shipping.get("name")
         customer_email = charge["billing_details"].get("email")
 
+        # Get cart items from metadata
         cart_json = intent["metadata"].get("cart_json", "[]")
         cart_items = json.loads(cart_json)
 
+        # Recalculate discount based on new tiers
+        subtotal = sum(float(i.get("price", 0)) * int(i.get("quantity", 1)) for i in cart_items)
+        total_items = sum(int(i.get("quantity", 1)) for i in cart_items)
+
+        discount_amount = 0
+        discount_label = ""
+
+        if total_items >= 10:
+            discount_amount = subtotal * 0.20
+            discount_label = "10+ Items Discount (20% Off)"
+        elif total_items >= 7:
+            discount_amount = subtotal * 0.15
+            discount_label = "7-9 Items Discount (15% Off)"
+        elif total_items >= 5:
+            discount_amount = subtotal * 0.10
+            discount_label = "5-6 Items Discount (10% Off)"
+        elif total_items >= 3:
+            discount_amount = subtotal * 0.05
+            discount_label = "3-4 Items Discount (5% Off)"
+
+        # Pass all relevant info to notify_checkout
         with current_app.test_request_context(
             "/notify-checkout",
             method="POST",
@@ -314,7 +340,8 @@ def stripe_webhook():
                 "email": customer_email,
                 "cart": cart_items,
                 "shipping": shipping,
-                "discount": discount
+                "discount": discount_amount,
+                "discount_label": discount_label
             },
         ):
             print("STRIPE METADATA:", intent["metadata"])

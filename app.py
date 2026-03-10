@@ -42,6 +42,7 @@ def contact():
     return render_template("contact.html")
 
 # --- Create PaymentIntent ---
+# --- Create PaymentIntent ---
 @app.route("/create-payment-intent", methods=["POST"])
 def create_payment_intent():
     data = request.json
@@ -55,16 +56,23 @@ def create_payment_intent():
     discount_amount = 0
     discount_label = ""
 
-    if total_items >= 5:
+    # --- New tiered discount ---
+    if total_items >= 10:
         discount_amount = subtotal * 0.20
-        discount_label = "5+ Item Bundle Discount (20% Off)"
-
+        discount_label = "10+ Items Discount (20% Off)"
+    elif total_items >= 7:
+        discount_amount = subtotal * 0.15
+        discount_label = "7-9 Items Discount (15% Off)"
+    elif total_items >= 5:
+        discount_amount = subtotal * 0.10
+        discount_label = "5-6 Items Discount (10% Off)"
     elif total_items >= 3:
-        discount_amount = subtotal * (1 - (5000/6000))
-        discount_label = "3 Item Bundle Discount (~16.7% Off)"
+        discount_amount = subtotal * 0.05
+        discount_label = "3-4 Items Discount (5% Off)"
 
-    discounted_total = subtotal - discount_amount
-    shipping_cost = 0
+    discounted_total = max(subtotal - discount_amount, 0)
+
+    shipping_cost = 0  # Update if needed
     total_amount = discounted_total + shipping_cost
     amount_cents = int(total_amount * 100)
     items_summary = ", ".join([f"{i['name']} x{i['quantity']}" for i in cart])
@@ -78,12 +86,13 @@ def create_payment_intent():
             "items": items_summary,
             "items_count": total_items,
             "discount_label": discount_label,
-            "discount_amount": discount_amount,   # IMPORTANT
-            "final_price": total_amount,
+            "discount_amount": f"{discount_amount:.2f}",
+            "final_price": f"{total_amount:.2f}",
             "customer_email": customer_email,
             "cart_json": json.dumps(cart)
         }
     )
+
     return jsonify({"client_secret": intent.client_secret})
 
 if __name__ == "__main__":

@@ -26,17 +26,24 @@ if (cart.length) {
   const shipping = 0.00;
 
     // --- Discount Rules ---
-    let originalTotal = subtotal;
+    let originalTotal = subtotal; // <-- add this
+
     let discountedTotal = subtotal;
     let discountLabel = "";
 
     // --- Discount Rules by percentage ---
-    if (totalItems >= 5) {
+    if (totalItems >= 10) {
     discountedTotal = subtotal * 0.8; // 20% off
-    discountLabel = "5+ Item Bundle Discount (20% Off)";
+    discountLabel = "10+ Item Bundle Discount (20% Off)";
+    } else if (totalItems >= 7) {
+    discountedTotal = subtotal * 0.85; // 15% off
+    discountLabel = "7-9 Item Bundle Discount (15% Off)";
+    } else if (totalItems >= 5) {
+    discountedTotal = subtotal * 0.9; // 10% off
+    discountLabel = "5-6 Item Bundle Discount (10% Off)";
     } else if (totalItems >= 3) {
-    discountedTotal = subtotal * (5000/6000); // ~16.67% off
-    discountLabel = "3 Item Bundle Discount (~16.7% Off)";
+    discountedTotal = subtotal * 0.95; // 5% off
+    discountLabel = "3-4 Item Bundle Discount (5% Off)";
     }
 
 // Ensure total is not negative
