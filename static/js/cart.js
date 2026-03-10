@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
       saveCart();
       renderCartDropdown();
     }
-    localStorage.removeItem("cart");
   });
 
   // Add-to-cart buttons

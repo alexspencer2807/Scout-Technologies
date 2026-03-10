@@ -261,3 +261,10 @@
     font-size: 0.85rem;
   }
 }
+.checkout-notice {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-top: 10px;
+  text-align: center;
+  margin-bottom: 10px;
+}
