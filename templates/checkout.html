@@ -19,8 +19,9 @@
 
 <header class="site-header">
   <div class="header-inner container">
-    <img src="{{ url_for('static', filename='media/Scout Videography Logo.jpg') }}" class="header-logo" alt="Logo">
-
+      <a href="{{ url_for('home') }}" class="header-logo-link">
+        <img src="{{ url_for('static', filename='media/Scout Videography Logo.jpg') }}" class="header-logo" alt="Logo">
+      </a>
     <ul class="nav-list">
       <li><a href="{{ url_for('home') }}">Home</a></li>
       <li><a href="{{ url_for('products') }}">Shop</a></li>

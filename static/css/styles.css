@@ -42,7 +42,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ================= LAYOUT ================= */
 .section {
-  padding: 5px;
+  padding: 5px 0px;
   background: var(--bg-main);
 }
 
@@ -356,7 +356,6 @@ h1, h2, h3, h4, h5, h6 {
   overflow-x: auto;
   gap: 25px;
   padding: 30px 0;
-  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
 

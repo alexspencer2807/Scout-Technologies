@@ -1,5 +1,11 @@
-"__pycache__/" 
-".env" 
+.env
+__pycache__/
+*.pyc
+static/receipts/
+*.pdf
+*.txt
+tempCodeRunnerFile.py
 
 
-".env" 
+
+
